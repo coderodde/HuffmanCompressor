@@ -1,9 +1,11 @@
 package net.coderodde.compression.huffman;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * This class implements a Huffman tree for building a prefix code.
@@ -102,6 +104,21 @@ public final class HuffmanTree {
         
         BitString bitStringBuilder = new BitString();
         inferEncodingMapImpl(bitStringBuilder, root, map);
+        
+        int sz = 0;
+        int minsz = Integer.MAX_VALUE;
+        Set<Byte> set = new HashSet<>();
+        for (Map.Entry<Byte, BitString> e : map.entrySet()) {
+            sz = Math.max(sz, e.getValue().length());
+            set.add(e.getKey());
+            minsz = Math.min(minsz, e.getValue().length());
+        }
+        
+        System.out.println("Min code word length: " + minsz);
+        System.out.println("Max code word length: " + sz);
+        System.out.println("Different bytes: " + set.size());
+        
+        
         return map;
     }
     

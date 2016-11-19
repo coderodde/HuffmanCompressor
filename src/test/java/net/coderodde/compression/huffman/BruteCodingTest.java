@@ -9,11 +9,11 @@ import static org.junit.Assert.*;
 public final class BruteCodingTest {
 
     private static final int ITERATIONS = 10;
-    private static final int MAX_STRING_LENGTH = 10;
+    private static final int MAX_STRING_LENGTH = 1000;
     
     @Test
     public void testBrute() {
-        long seed = 1479550190254L; System.currentTimeMillis();
+        long seed = 10214L; System.currentTimeMillis();
         Random random = new Random(seed);
         
         System.out.println("Seed = " + seed);
@@ -36,6 +36,21 @@ public final class BruteCodingTest {
             // Correct until here.
             HuffmanDeserializer.Result deserializationResult =
                     new HuffmanDeserializer().deserialize(encodedData);
+            
+            if (iteration == 1) {
+                System.out.println("Checking...");
+                Map<Byte, BitString> deser = deserializationResult.getEncoderMap();
+                for (Map.Entry<Byte, BitString> e : encoderMap.entrySet()) {
+                    if (!deser.get(e.getKey()).equals(e.getValue())) {
+                        System.out.println(e.getKey() + ": " + e.getValue() + " vs " + deser.get(e.getKey()));
+                    }
+                }
+            }
+            
+            assertEquals(deserializationResult.getEncoderMap(),
+                         encoderMap);
+            
+            assertEquals(encodedText, deserializationResult.getEncodedText());
             
             byte[] recoveredText =
                     new HuffmanDecoder()

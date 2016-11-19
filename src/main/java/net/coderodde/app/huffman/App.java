@@ -25,6 +25,13 @@ public class App {
         Map<Byte, BitString> encoderMap = new HuffmanTree(weightMap)
                                               .inferEncodingMap();
         
+        int sz = 0;
+        for (Map.Entry<Byte, BitString> e : encoderMap.entrySet()) {
+            sz = Math.max(sz, e.getValue().length());
+        }
+        
+        System.out.println(sz);
+        
         BitString encodedText = new HuffmanEncoder().encode(encoderMap, bytes);
         byte[] decodedText = new HuffmanDecoder().decode(encodedText, encoderMap);
         

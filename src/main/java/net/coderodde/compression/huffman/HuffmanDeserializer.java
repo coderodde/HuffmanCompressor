@@ -95,16 +95,25 @@ public class HuffmanDeserializer {
                 int codeWordLength = data[dataByteIndex++];
                 int bitIndex = 0;
                 BitString codeWordBits = new BitString();
-                byte codeWordByte = data[dataByteIndex++];
                 
-                for (int codeWordBitIndex = 0; 
+                for (int codeWordBitIndex = 0;
                         codeWordBitIndex != codeWordLength;
                         codeWordBitIndex++) {
-                    boolean bit = (codeWordByte & (1 << codeWordBitIndex)) != 0;
+                    byte currentByte = data[dataByteIndex];
+                    boolean bit = (currentByte & (1 << bitIndex)) != 0;
                     codeWordBits.appendBit(bit);
+                    
+                    if (++bitIndex == Byte.SIZE) {
+                        bitIndex = 0;
+                        dataByteIndex++;
+                    }
                 }
-
+                
                 encoderMap.put(character, codeWordBits);
+                
+                if (bitIndex != 0) {
+                    dataByteIndex++;
+                }
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new InvalidFileFormatException("Invalid file format.");
@@ -118,9 +127,12 @@ public class HuffmanDeserializer {
                                          int numberOfEncodedTextBits) {
         int omittedBytes = HuffmanSerializer.MAGIC.length +
                            HuffmanSerializer.BYTES_PER_BIT_COUNT_ENTRY +
-                           HuffmanSerializer.BYTES_PER_CODE_WORD_COUNT_ENTRY +
-                           encoderMap.size() * 3; // 3 = Number of bytes per 
-                                                  // codeword.
+                           HuffmanSerializer.BYTES_PER_CODE_WORD_COUNT_ENTRY;
+        
+        for (Map.Entry<Byte, BitString> entry : encoderMap.entrySet()) {
+            omittedBytes += 2 + entry.getValue().getNumberOfBytesOccupied();
+        }
+        
         BitString encodedText = new BitString();
         int currentByteIndex = omittedBytes;
         int currentBitIndex = 0;

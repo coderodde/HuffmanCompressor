@@ -23,7 +23,7 @@ public final class HuffmanSerializer {
      * The number of bytes it takes to serialize one mapping from a character
      * to its code word.
      */
-    static final int BYTES_PER_ENCODER_MAP_ENTRY = 3;
+    static final int BYTES_PER_ENCODER_MAP_ENTRY = 4;
     
     /**
      * The number of bytes it takes to serialize the number of code words.
@@ -82,7 +82,11 @@ public final class HuffmanSerializer {
             byteList.appendByte(codeWordLength);
             
             // Emit the code word bits:
-            byteList.appendByte(codeWord.toByteArray()[0]);
+            byte[] codewordBytes = codeWord.toByteArray();
+            
+            for (byte b : codewordBytes) {
+                byteList.appendByte(b);
+            }
         }
         
         byte[] encodedTextBytes = encodedText.toByteArray();
