@@ -5,7 +5,9 @@ import java.util.Map;
 import net.coderodde.compression.huffman.BitString;
 import net.coderodde.compression.huffman.CharacterWeightComputer;
 import net.coderodde.compression.huffman.HuffmanDecoder;
+import net.coderodde.compression.huffman.HuffmanDeserializer;
 import net.coderodde.compression.huffman.HuffmanEncoder;
+import net.coderodde.compression.huffman.HuffmanSerializer;
 import net.coderodde.compression.huffman.HuffmanTree;
 
 public class App {
@@ -27,5 +29,12 @@ public class App {
         byte[] decodedText = new HuffmanDecoder().decode(encodedText, encoderMap);
         
         System.out.println(Arrays.equals(decodedText, bytes));
+        
+        byte[] serializedData = new HuffmanSerializer().serialize(encoderMap, encodedText);
+        HuffmanDeserializer.Result result = new HuffmanDeserializer().deserialize(serializedData);
+        
+        byte[] recoveredText = new HuffmanDecoder().decode(result.getEncodedText(), result.getEncoderMap());
+        
+        System.out.println(Arrays.equals(bytes, recoveredText));
     }
 }
