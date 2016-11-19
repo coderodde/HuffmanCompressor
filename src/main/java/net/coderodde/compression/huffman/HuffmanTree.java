@@ -73,6 +73,12 @@ public final class HuffmanTree {
     
     private HuffmanTreeNode root;
     
+    /**
+     * Constructs a Huffman tree from the character frequencies 
+     * {@code weightMap}.
+     * 
+     * @param weightMap the map mapping each byte to its relative frequency.
+     */
     public HuffmanTree(Map<Byte, Float> weightMap) {
         if (weightMap.isEmpty()) {
             throw new IllegalArgumentException(
@@ -96,6 +102,11 @@ public final class HuffmanTree {
         root = queue.peek();
     }
     
+    /**
+     * Construct the encoder map from this tree.
+     * 
+     * @return the encoder map.
+     */
     public Map<Byte, BitString> inferEncodingMap() {
         Map<Byte, BitString> map = new HashMap<>();
         
