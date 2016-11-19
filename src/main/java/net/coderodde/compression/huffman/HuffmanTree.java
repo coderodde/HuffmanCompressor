@@ -74,6 +74,11 @@ public final class HuffmanTree {
     private HuffmanTreeNode root;
     
     public HuffmanTree(Map<Byte, Float> weightMap) {
+        if (weightMap.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Compressor requires a non-empty text.");
+        }
+        
         Queue<HuffmanTreeNode> queue = new PriorityQueue<>();
         
         for (Map.Entry<Byte, Float> entry : weightMap.entrySet()) {
@@ -104,21 +109,6 @@ public final class HuffmanTree {
         
         BitString bitStringBuilder = new BitString();
         inferEncodingMapImpl(bitStringBuilder, root, map);
-        
-        int sz = 0;
-        int minsz = Integer.MAX_VALUE;
-        Set<Byte> set = new HashSet<>();
-        for (Map.Entry<Byte, BitString> e : map.entrySet()) {
-            sz = Math.max(sz, e.getValue().length());
-            set.add(e.getKey());
-            minsz = Math.min(minsz, e.getValue().length());
-        }
-        
-        System.out.println("Min code word length: " + minsz);
-        System.out.println("Max code word length: " + sz);
-        System.out.println("Different bytes: " + set.size());
-        
-        
         return map;
     }
     

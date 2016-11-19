@@ -1,5 +1,6 @@
 package net.coderodde.compression.huffman;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
@@ -64,4 +65,32 @@ public class HuffmanDeserializerTest {
         
         assertEquals(encoderMap, result.getEncoderMap());
     }    
+    
+    @Test(expected = InvalidFileFormatException.class) 
+    public void testBadSignature() {
+        byte[] data = new byte[100];
+        data[0] = HuffmanSerializer.MAGIC[0];
+        data[1] = HuffmanSerializer.MAGIC[1];
+        data[3] = HuffmanSerializer.MAGIC[3];
+        new HuffmanDeserializer().deserialize(data);
+    }
+    
+    @Test(expected = InvalidFileFormatException.class)
+    public void testTooShortText() {
+        byte[] text = { (byte) 1, (byte) 2, (byte) 3, (byte) 4,
+                        (byte) 5, (byte) 6, (byte) 7, (byte) 8,
+                        (byte) 9, (byte) 0, (byte) 11, (byte) 10 };
+        
+        Map<Byte, BitString> encoderMap = 
+                new HuffmanTree(
+                        new CharacterWeightComputer()
+                                .computeCharacterWeights(text))
+                        .inferEncodingMap();
+        
+        BitString encodedData = new HuffmanEncoder().encode(encoderMap, text);
+        byte[] shit = new HuffmanSerializer().serialize(encoderMap, 
+                                                        encodedData);
+        shit = Arrays.copyOf(shit, shit.length - 2);
+        new HuffmanDeserializer().deserialize(shit);
+    }
 }

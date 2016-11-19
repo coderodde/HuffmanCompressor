@@ -137,18 +137,22 @@ public class HuffmanDeserializer {
         int currentByteIndex = omittedBytes;
         int currentBitIndex = 0;
         
-        for (int bitIndex = 0; 
-                bitIndex != numberOfEncodedTextBits; 
-                bitIndex++) {
-            boolean bit = 
-                    (data[currentByteIndex] & (1 << currentBitIndex)) != 0;
-            
-            encodedText.appendBit(bit);
-            
-            if (++currentBitIndex == Byte.SIZE) {
-                currentBitIndex = 0;
-                currentByteIndex++;
+        try {
+            for (int bitIndex = 0; 
+                    bitIndex != numberOfEncodedTextBits; 
+                    bitIndex++) {
+                boolean bit = 
+                        (data[currentByteIndex] & (1 << currentBitIndex)) != 0;
+
+                encodedText.appendBit(bit);
+
+                if (++currentBitIndex == Byte.SIZE) {
+                    currentBitIndex = 0;
+                    currentByteIndex++;
+                }
             }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new InvalidFileFormatException("Invalid file format.");
         }
         
         return encodedText;

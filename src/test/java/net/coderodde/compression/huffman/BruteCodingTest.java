@@ -13,13 +13,12 @@ public final class BruteCodingTest {
     
     @Test
     public void testBrute() {
-        long seed = 10214L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         
         System.out.println("Seed = " + seed);
         
         for (int iteration = 0; iteration < ITERATIONS; ++iteration) {
-            System.out.println("Iteration " + iteration);
             byte[] text = randomBytes(1 + random.nextInt(MAX_STRING_LENGTH),
                                       random);
             Map<Byte, Float> weightMap = 
@@ -36,16 +35,6 @@ public final class BruteCodingTest {
             // Correct until here.
             HuffmanDeserializer.Result deserializationResult =
                     new HuffmanDeserializer().deserialize(encodedData);
-            
-            if (iteration == 1) {
-                System.out.println("Checking...");
-                Map<Byte, BitString> deser = deserializationResult.getEncoderMap();
-                for (Map.Entry<Byte, BitString> e : encoderMap.entrySet()) {
-                    if (!deser.get(e.getKey()).equals(e.getValue())) {
-                        System.out.println(e.getKey() + ": " + e.getValue() + " vs " + deser.get(e.getKey()));
-                    }
-                }
-            }
             
             assertEquals(deserializationResult.getEncoderMap(),
                          encoderMap);
