@@ -91,6 +91,15 @@ public final class HuffmanTree {
     
     public Map<Byte, BitString> inferEncodingMap() {
         Map<Byte, BitString> map = new HashMap<>();
+        
+        if (root.isLeaf) {
+            // Corner case. Only one byte value in the text.
+            BitString bs = new BitString();
+            bs.appendBit(false);
+            map.put(root.character, bs);
+            return map;
+        }
+        
         BitString bitStringBuilder = new BitString();
         inferEncodingMapImpl(bitStringBuilder, root, map);
         return map;
