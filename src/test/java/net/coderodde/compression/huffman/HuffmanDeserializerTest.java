@@ -83,7 +83,7 @@ public class HuffmanDeserializerTest {
         
         Map<Byte, BitString> encoderMap = 
                 new HuffmanTree(
-                        new CharacterWeightComputer()
+                        new ByteWeightComputer()
                                 .computeCharacterWeights(text))
                         .inferEncodingMap();
         

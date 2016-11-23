@@ -22,13 +22,13 @@ public final class HuffmanEncoder {
     public BitString encode(Map<Byte, BitString> map, byte[] text) {
         BitString outputBitString = new BitString();
         int textLength = text.length;
-        
+
         for (int index = 0; index != textLength; ++index) {
             byte currentByte = text[index];
             BitString codeWord = map.get(currentByte);
             outputBitString.appendBitsFrom(codeWord);
         }
-        
+
         return outputBitString;
     }
 }

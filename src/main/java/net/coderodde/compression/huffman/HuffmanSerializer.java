@@ -18,24 +18,24 @@ public final class HuffmanSerializer {
                                             (byte) 0xDE,
                                             (byte) 0x0D,
                                             (byte) 0xDE };
-    
+
     /**
      * The number of bytes it takes to serialize one mapping from a character
      * to its code word.
      */
     static final int BYTES_PER_ENCODER_MAP_ENTRY = 4;
-    
+
     /**
      * The number of bytes it takes to serialize the number of code words.
      */
     static final int BYTES_PER_CODE_WORD_COUNT_ENTRY = 4;
-    
+
     /**
      * The number of bytes it takes to serialize the number of bits in the 
      * actual encoded text.
      */
     static final int BYTES_PER_BIT_COUNT_ENTRY = 4;
-    
+
     /**
      * Produces a byte array holding the compressed text along with its 
      * encoder map.
@@ -52,52 +52,52 @@ public final class HuffmanSerializer {
         for (byte b : MAGIC) {
             byteList.appendByte(b);
         }
-        
+
         int numberOfCodeWords = encoderMap.size();
         int numberOfBits = encodedText.length();
-        
+
         // Emit the number of code words.
         byteList.appendByte((byte) (numberOfCodeWords & 0xff));
         byteList.appendByte((byte)((numberOfCodeWords >>= 8) & 0xff));
         byteList.appendByte((byte)((numberOfCodeWords >>= 8) & 0xff));
         byteList.appendByte((byte)((numberOfCodeWords >>= 8) & 0xff));
-        
+
         // Emit the number of bits in the encoded text.
         byteList.appendByte((byte) (numberOfBits & 0xff));
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
-        
+
         // Emit the code words:
         for (Map.Entry<Byte, BitString> entry 
                 : encoderMap.entrySet()) {
             byte character = entry.getKey();
             BitString codeWord = entry.getValue();
-            
+
             // Emit the character:
             byteList.appendByte(character);
-            
+
             // Emit the codeword length:
             byte codeWordLength = (byte) codeWord.length();
             byteList.appendByte(codeWordLength);
-            
+
             // Emit the code word bits:
             byte[] codewordBytes = codeWord.toByteArray();
-            
+
             for (byte b : codewordBytes) {
                 byteList.appendByte(b);
             }
         }
-        
+
         byte[] encodedTextBytes = encodedText.toByteArray();
-        
+
         for (byte b : encodedTextBytes) {
             byteList.appendByte(b);
         }
-        
+
         return byteList.toByteArray();
     }
-    
+
     private int computeByteListSize(Map<Byte, BitString> encoderMap,
                                     BitString encodedText) {
         return MAGIC.length + BYTES_PER_CODE_WORD_COUNT_ENTRY

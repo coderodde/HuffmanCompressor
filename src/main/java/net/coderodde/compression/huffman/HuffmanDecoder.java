@@ -26,29 +26,29 @@ public final class HuffmanDecoder {
         ByteList byteList = new ByteList();
         BitString bitAccumulator = new BitString();
         int totalBits = bits.length();
-        
+
         for (int bitIndex = 0; bitIndex != totalBits; ++bitIndex) {
             bitAccumulator.appendBit(bits.readBit(bitIndex));
             Byte currentByte = decoderMap.get(bitAccumulator);
-            
+
             if (currentByte != null) {
                 byteList.appendByte(currentByte);
                 bitAccumulator.clear();
             }
         }
-        
+
         return byteList.toByteArray();
     }
-    
+
     private Map<BitString, Byte>
             invertEncoderMap(Map<Byte, BitString> encoderMap) {
         Map<BitString, Byte> map = new HashMap<>(encoderMap.size());
-        
+
         for (Map.Entry<Byte, BitString> entry 
                 : encoderMap.entrySet()) {
             map.put(entry.getValue(), entry.getKey());
         }
-        
+
         return map;
     }
 }

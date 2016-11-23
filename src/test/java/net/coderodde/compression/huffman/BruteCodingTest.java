@@ -22,7 +22,7 @@ public final class BruteCodingTest {
             byte[] text = randomBytes(1 + random.nextInt(MAX_STRING_LENGTH),
                                       random);
             Map<Byte, Float> weightMap = 
-                    new CharacterWeightComputer().computeCharacterWeights(text);
+                    new ByteWeightComputer().computeCharacterWeights(text);
             
             Map<Byte, BitString> encoderMap =
                     new HuffmanTree(weightMap).inferEncodingMap();

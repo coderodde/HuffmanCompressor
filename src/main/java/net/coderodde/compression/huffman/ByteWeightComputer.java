@@ -2,6 +2,7 @@ package net.coderodde.compression.huffman;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This class provides a method for counting relative frequencies of characters
@@ -10,7 +11,7 @@ import java.util.Map;
  * @author Rodion "rodde" Efremov
  * @version 1.618 (Nov 19, 2016)
  */
-public final class CharacterWeightComputer {
+public final class ByteWeightComputer {
 
     /**
      * Computes the map mapping each character in the text {@code text} to its
@@ -20,25 +21,25 @@ public final class CharacterWeightComputer {
      * @return the map mapping each character to its respective frequency.
      */
     public Map<Byte, Float> computeCharacterWeights(byte[] text) {
-        Map<Byte, Float> map = new HashMap<>();
+        Map<Byte, Float> map = new TreeMap<>();
         int textLength = text.length;
-        
+
         for (int i = 0; i != textLength; ++i) {
             byte currentByte = text[i];
-            
+
             if (map.containsKey(currentByte)) {
                 map.put(currentByte, map.get(currentByte) + 1.0f);
             } else {
                 map.put(currentByte, 1.0f);
             }
         }
-        
+
         float textLengthFloat = textLength;
-        
+
         for (Map.Entry<Byte, Float> entry : map.entrySet()) {
             entry.setValue(entry.getValue() / textLengthFloat);
         }
-        
+
         return map;
     }
 }
