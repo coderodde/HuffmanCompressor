@@ -1,6 +1,5 @@
 package net.coderodde.compression.huffman;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -39,7 +38,14 @@ public final class HuffmanTree {
 
         @Override
         public int compareTo(HuffmanTreeNode o) {
-            return Float.compare(weight, o.weight);
+            int cmp = Float.compare(weight, o.weight);
+            
+            if (cmp != 0) {
+                return cmp;
+            }
+            
+            // If reached here, equal weights so order by the character value:
+            return Byte.compare(character, o.character);
         }
 
         static HuffmanTreeNode merge(HuffmanTreeNode node1, 

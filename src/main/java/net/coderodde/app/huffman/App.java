@@ -99,7 +99,7 @@ public final class App {
         BitString encodedText = new HuffmanEncoder().encode(encodeMap,
                                                             fileBytes);
 
-        byte[] data = new HuffmanSerializer().serialize(encodeMap,
+        byte[] data = new HuffmanSerializer().serialize(weightMap,
                                                         encodedText);
 
         File outputFile = 
@@ -118,7 +118,7 @@ public final class App {
         try {
             int index = 0;
 
-            for (int i = 0; i < args.length; ++i) {
+            for (int i = args.length - 1; i >= 0; --i) {
                 if (args[i].equals("DECODE_OPTION_SHORT") 
                         || args[i].equals("DECODE_OPTION_LONG")) {
                     index = i;
@@ -136,11 +136,11 @@ public final class App {
         byte[] inputData = readBytes(new File(file1));
         HuffmanDeserializer.Result result = 
                 new HuffmanDeserializer().deserialize(inputData);
-//        byte[] originalData = new HuffmanDecoder()
-//                .decode(result.getEncodedText(),
-//                        result.getWeightMap());
-
-//        writeBytes(originalData, new File(file2));
+        HuffmanTree decoderTree = new HuffmanTree(result.getEncoderMap());
+        HuffmanDecoder decoder = new HuffmanDecoder();
+        byte[] originalData = decoder.decode(decoderTree, 
+                                             result.getEncodedText());
+        writeBytes(originalData, new File(file2));
     }
 
     private static Set<String> getCommandLineOptions(String[] args) {

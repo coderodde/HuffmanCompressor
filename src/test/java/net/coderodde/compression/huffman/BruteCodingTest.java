@@ -8,8 +8,8 @@ import static org.junit.Assert.*;
 
 public final class BruteCodingTest {
 
-    private static final int ITERATIONS = 10;
-    private static final int MAX_STRING_LENGTH = 1000;
+    private static final int ITERATIONS = 1;
+    private static final int MAX_STRING_LENGTH = 10;
     
     @Test
     public void testBrute() {
@@ -24,28 +24,27 @@ public final class BruteCodingTest {
             Map<Byte, Float> weightMap = 
                     new ByteWeightComputer().computeCharacterWeights(text);
             
-            Map<Byte, BitString> encoderMap =
-                    new HuffmanTree(weightMap).inferEncodingMap();
+            HuffmanTree tree = new HuffmanTree(weightMap);
             
-            BitString encodedText = new HuffmanEncoder().encode(encoderMap, 
-                                                                text);
+            Map<Byte, BitString> encoderMap = tree.inferEncodingMap();
             
-            byte[] encodedData = new HuffmanSerializer().serialize(encoderMap,
-                                                                   encodedText);
-            // Correct until here.
-            HuffmanDeserializer.Result deserializationResult =
-                    new HuffmanDeserializer().deserialize(encodedData);
+            HuffmanEncoder encoder = new HuffmanEncoder();
             
-            assertEquals(deserializationResult.getEncoderMap(),
-                         encoderMap);
+            BitString encodedText = encoder.encode(encoderMap, text);
             
-            assertEquals(encodedText, deserializationResult.getEncodedText());
+            HuffmanSerializer serializer = new HuffmanSerializer();
+            byte[] encodedData = serializer.serialize(weightMap, encodedText);
             
-            byte[] recoveredText =
-                    new HuffmanDecoder()
-                            .decode(deserializationResult.getEncodedText(),
-                                    deserializationResult.getEncoderMap());
+            HuffmanDeserializer deserializer = new HuffmanDeserializer();
+            HuffmanDeserializer.Result result = 
+                    deserializer.deserialize(encodedData);
             
+            HuffmanTree decoderTree = new HuffmanTree(result.getEncoderMap());
+            HuffmanDecoder decoder = new HuffmanDecoder();
+            byte[] recoveredText = decoder.decode(decoderTree, 
+                                                  result.getEncodedText());
+            
+            assertEquals(text.length, recoveredText.length);
             assertTrue(Arrays.equals(text, recoveredText));
         }
     }
