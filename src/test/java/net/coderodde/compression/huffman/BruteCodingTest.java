@@ -13,7 +13,7 @@ public final class BruteCodingTest {
     
     @Test
     public void testBrute() {
-        long seed = System.currentTimeMillis();
+        long seed = 1480181092111L; System.currentTimeMillis();
         Random random = new Random(seed);
         
         System.out.println("Seed = " + seed);
