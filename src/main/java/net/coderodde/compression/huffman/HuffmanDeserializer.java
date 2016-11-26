@@ -14,20 +14,20 @@ public class HuffmanDeserializer {
     public static final class Result {
 
         private final BitString encodedText;
-        private final Map<Byte, BitString> encoderMap;
+        private final Map<Byte, Float> weightMap;
 
         Result(BitString encodedText, 
-               Map<Byte, BitString> encoderMap) {
+               Map<Byte, Float> weightMap) {
             this.encodedText = encodedText;
-            this.encoderMap  = encoderMap;
+            this.weightMap   = weightMap;
         }
 
         public BitString getEncodedText() {
             return encodedText;
         }
 
-        public Map<Byte, BitString> getEncoderMap() {
-            return encoderMap;
+        public Map<Byte, Float> getEncoderMap() {
+            return weightMap;
         }
     }
 
@@ -42,12 +42,12 @@ public class HuffmanDeserializer {
         int numberOfCodeWords = extractNumberOfCodeWords(data);
         int numberOfBits = extractNumberOfEncodedTextBits(data);
 
-        Map<Byte, BitString> encoderMap = extractEncoderMap(data, 
-                                                            numberOfCodeWords);
+        Map<Byte, Float> weightMap = extractWeightMap(data, 
+                                                      numberOfCodeWords);
         BitString encodedText = extractEncodedText(data, 
-                                                   encoderMap, 
+                                                   weightMap, 
                                                    numberOfBits);
-        return new Result(encodedText, encoderMap);
+        return new Result(encodedText, weightMap);
     }
 
     private void checkSignature(byte[] data) {
@@ -80,9 +80,9 @@ public class HuffmanDeserializer {
         return numberOfCodeWords;
     }
 
-    private Map<Byte, BitString> extractEncoderMap(byte[] data,
-                                                   int numberOfCodeWords) {
-        Map<Byte, BitString> encoderMap = new HashMap<>();
+    private Map<Byte, Float> extractWeightMap(byte[] data,
+                                              int numberOfCodeWords) {
+        Map<Byte, Float> weightMap = new HashMap<>();
 
         try {
             int dataByteIndex =
@@ -92,46 +92,35 @@ public class HuffmanDeserializer {
 
             for (int i = 0; i != numberOfCodeWords; ++i) {
                 byte character = data[dataByteIndex++];
-                int codeWordLength = data[dataByteIndex++];
-                int bitIndex = 0;
-                BitString codeWordBits = new BitString();
-
-                for (int codeWordBitIndex = 0;
-                        codeWordBitIndex != codeWordLength;
-                        codeWordBitIndex++) {
-                    byte currentByte = data[dataByteIndex];
-                    boolean bit = (currentByte & (1 << bitIndex)) != 0;
-                    codeWordBits.appendBit(bit);
-
-                    if (++bitIndex == Byte.SIZE) {
-                        bitIndex = 0;
-                        dataByteIndex++;
-                    }
-                }
-
-                encoderMap.put(character, codeWordBits);
-
-                if (bitIndex != 0) {
-                    dataByteIndex++;
-                }
+                byte weightByte1 = data[dataByteIndex++];
+                byte weightByte2 = data[dataByteIndex++];
+                byte weightByte3 = data[dataByteIndex++];
+                byte weightByte4 = data[dataByteIndex++];
+                
+                int weightBits = Byte.toUnsignedInt(weightByte1);
+                weightBits |= (Byte.toUnsignedInt(weightByte2) << 8);
+                weightBits |= (Byte.toUnsignedInt(weightByte3) << 16);
+                weightBits |= (Byte.toUnsignedInt(weightByte4) << 24);
+                
+                float weight = Float.intBitsToFloat(weightBits);
+                
+                weightMap.put(character, weight);
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new InvalidFileFormatException("Invalid file format.");
+            throw new InvalidFileFormatException("Invalid format.");
         }
 
-        return encoderMap;
+        return weightMap;
     }
 
     private BitString extractEncodedText(byte[] data,
-                                         Map<Byte, BitString> encoderMap,
+                                         Map<Byte, Float> weightMap,
                                          int numberOfEncodedTextBits) {
         int omittedBytes = HuffmanSerializer.MAGIC.length +
                            HuffmanSerializer.BYTES_PER_BIT_COUNT_ENTRY +
                            HuffmanSerializer.BYTES_PER_CODE_WORD_COUNT_ENTRY;
-
-        for (Map.Entry<Byte, BitString> entry : encoderMap.entrySet()) {
-            omittedBytes += 2 + entry.getValue().getNumberOfBytesOccupied();
-        }
+        omittedBytes +=
+                weightMap.size() * HuffmanSerializer.BYTES_PER_WEIGHT_MAP_ENTRY;
 
         BitString encodedText = new BitString();
         int currentByteIndex = omittedBytes;

@@ -23,7 +23,7 @@ public final class HuffmanSerializer {
      * The number of bytes it takes to serialize one mapping from a character
      * to its code word.
      */
-    static final int BYTES_PER_ENCODER_MAP_ENTRY = 4;
+    static final int BYTES_PER_WEIGHT_MAP_ENTRY = 5;
 
     /**
      * The number of bytes it takes to serialize the number of code words.
@@ -40,20 +40,20 @@ public final class HuffmanSerializer {
      * Produces a byte array holding the compressed text along with its 
      * encoder map.
      * 
-     * @param encoderMap  the encoder map used for encoding the text.
+     * @param weightMap   the encoder map used for encoding the text.
      * @param encodedText the encoded text.
      * @return an array of byte.
      */
-    public byte[] serialize(Map<Byte, BitString> encoderMap,
+    public byte[] serialize(Map<Byte, Float> weightMap,
                             BitString encodedText) {
-        ByteList byteList = new ByteList(computeByteListSize(encoderMap, 
+        ByteList byteList = new ByteList(computeByteListSize(weightMap, 
                                                              encodedText));
         // Emit the magic number:
         for (byte b : MAGIC) {
             byteList.appendByte(b);
         }
 
-        int numberOfCodeWords = encoderMap.size();
+        int numberOfCodeWords = weightMap.size();
         int numberOfBits = encodedText.length();
 
         // Emit the number of code words.
@@ -69,28 +69,24 @@ public final class HuffmanSerializer {
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
 
         // Emit the code words:
-        for (Map.Entry<Byte, BitString> entry 
-                : encoderMap.entrySet()) {
+        for (Map.Entry<Byte, Float> entry : weightMap.entrySet()) {
             byte character = entry.getKey();
-            BitString codeWord = entry.getValue();
-
+            float weight = entry.getValue();
+            int weightData = Float.floatToIntBits(weight);
+            
             // Emit the character:
             byteList.appendByte(character);
 
-            // Emit the codeword length:
-            byte codeWordLength = (byte) codeWord.length();
-            byteList.appendByte(codeWordLength);
-
-            // Emit the code word bits:
-            byte[] codewordBytes = codeWord.toByteArray();
-
-            for (byte b : codewordBytes) {
-                byteList.appendByte(b);
-            }
+            // Emit the bytes of the weight value:
+            byteList.appendByte((byte) (weightData & 0xff));
+            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
+            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
+            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
         }
 
         byte[] encodedTextBytes = encodedText.toByteArray();
 
+        // Emit the encoded text:
         for (byte b : encodedTextBytes) {
             byteList.appendByte(b);
         }
@@ -98,11 +94,11 @@ public final class HuffmanSerializer {
         return byteList.toByteArray();
     }
 
-    private int computeByteListSize(Map<Byte, BitString> encoderMap,
+    private int computeByteListSize(Map<Byte, Float> weightMap,
                                     BitString encodedText) {
         return MAGIC.length + BYTES_PER_CODE_WORD_COUNT_ENTRY
                             + BYTES_PER_BIT_COUNT_ENTRY
-                            + encoderMap.size() * BYTES_PER_ENCODER_MAP_ENTRY 
+                            + weightMap.size() * BYTES_PER_WEIGHT_MAP_ENTRY 
                             + encodedText.getNumberOfBytesOccupied();
     }
 }

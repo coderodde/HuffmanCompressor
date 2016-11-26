@@ -14,6 +14,10 @@ import java.util.TreeMap;
  */
 public final class HuffmanTree {
 
+    static final class IntHolder {
+        int value;
+    }
+    
     private static final class HuffmanTreeNode 
             implements Comparable<HuffmanTreeNode> {
 
@@ -99,6 +103,17 @@ public final class HuffmanTree {
         }
 
         root = queue.peek();
+    }
+    
+    public byte decodeBitString(IntHolder index, BitString bitString) {
+        HuffmanTreeNode currentNode = root;
+        
+        while (currentNode.isLeaf == false) {
+            boolean bit = bitString.readBit(index.value++);
+            currentNode = (bit ? currentNode.right : currentNode.left);
+        }
+        
+        return currentNode.character;
     }
 
     /**

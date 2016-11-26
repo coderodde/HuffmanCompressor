@@ -163,66 +163,6 @@ public final class BitString {
         return sb.toString();
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        int fullLongs = size / BITS_PER_LONG;
-
-        for (int i = 0; i != fullLongs; ++i) {
-            long word = storageLongs[i];
-            hash += (int)((word & 0xffffffff00000000L) ^ 
-                          (word & 0xffffffff));
-        }
-
-        int leftoverBits = size & MODULO_MASK;
-
-        for (int i = 0; i != leftoverBits; ++i) {
-            hash += readBitImpl(fullLongs * BITS_PER_LONG + i) ? 1 : 0;
-        }
-
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-
-        if (o == this) {
-            return true;
-        }
-
-        if (!getClass().equals(o.getClass())) {
-            return false;
-        }
-
-        BitString other = (BitString) o;
-
-        if (size != other.size) {
-            return false;
-        }
-
-        int fullLongs = size / BITS_PER_LONG;
-
-        for (int i = 0; i != fullLongs; ++i) {
-            if (storageLongs[i] != other.storageLongs[i]) {
-                return false;
-            }
-        }
-
-        int leftoverBits = size & MODULO_MASK;
-
-        for (int i = 0; i != leftoverBits; ++i) {
-            if (readBitImpl(fullLongs * BITS_PER_LONG + i) !=
-                other.readBitImpl(fullLongs * BITS_PER_LONG + i)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private void checkAccessIndex(int index) {
         if (size == 0) {
             throw new IllegalStateException("The bit string is empty.");

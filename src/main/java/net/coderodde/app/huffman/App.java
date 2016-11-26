@@ -136,11 +136,11 @@ public final class App {
         byte[] inputData = readBytes(new File(file1));
         HuffmanDeserializer.Result result = 
                 new HuffmanDeserializer().deserialize(inputData);
-        byte[] originalData = new HuffmanDecoder()
-                .decode(result.getEncodedText(),
-                        result.getEncoderMap());
+//        byte[] originalData = new HuffmanDecoder()
+//                .decode(result.getEncodedText(),
+//                        result.getWeightMap());
 
-        writeBytes(originalData, new File(file2));
+//        writeBytes(originalData, new File(file2));
     }
 
     private static Set<String> getCommandLineOptions(String[] args) {

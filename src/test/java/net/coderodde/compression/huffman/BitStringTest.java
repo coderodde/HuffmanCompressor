@@ -143,52 +143,6 @@ public class BitStringTest {
     }    
     
     @Test
-    public void testHashCode() {
-        BitString b1 = new BitString();
-        BitString b2 = new BitString();
-        
-        for (int i = 0; i != 1000; ++i) {
-            boolean bit = i % 2 == 0;
-            b1.appendBit(bit);
-            b2.appendBit(bit);
-            
-            assertTrue(b1.hashCode() == b2.hashCode());
-        }
-    }
-    
-    @Test
-    public void testEquals() {
-        BitString b1 = new BitString();
-        BitString b2 = new BitString();
-        
-        assertTrue(b1.equals(b2));
-        assertFalse(b1.equals(""));
-        
-        b1.appendBit(true);
-        assertFalse(b1.equals(b2));
-        
-        b2.appendBit(true);
-        assertTrue(b1.equals(b2));
-        
-        b1.appendBit(false);
-        assertFalse(b1.equals(b2));
-        
-        b2.appendBit(false);
-        assertTrue(b1.equals(b2));
-        
-        assertTrue(b1.equals(b1));
-        assertTrue(b2.equals(b2));
-        
-        for (int i = 0; i != 1000; ++i) {
-            boolean bit = i % 2 == 0;
-            b1.appendBit(bit);
-            assertFalse(b1.equals(b2));
-            b2.appendBit(bit);
-            assertTrue(b1.equals(b2));
-        }
-    }
-    
-    @Test
     public void testNumberOfBytes() {
         BitString b = new BitString();
         assertEquals(0, b.getNumberOfBytesOccupied());
