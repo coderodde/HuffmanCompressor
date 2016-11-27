@@ -109,6 +109,10 @@ public final class HuffmanTree {
     
     public byte decodeBitString(IntHolder index, BitString bitString) {
         if (root.isLeaf) {
+            // Ugly special case: the encoded text contains only one distinct
+            // byte value. Return it and increment the index holder. If we would
+            // not handle this special case. The below while loop would become
+            // infinite.
             index.value++;
             return root.character;
         }

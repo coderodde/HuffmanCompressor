@@ -9,17 +9,17 @@ import static org.junit.Assert.*;
 public final class BruteCodingTest {
 
     private static final int ITERATIONS = 10;
-    private static final int MAX_STRING_LENGTH = 10;
+    private static final int MAX_STRING_LENGTH = 1000;
     
     @Test
     public void testBrute() {
-        long seed = 1480181092111L; System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         Random random = new Random(seed);
         
         System.out.println("Seed = " + seed);
         
         for (int iteration = 0; iteration < ITERATIONS; ++iteration) {
-            System.out.println("Iteration: " + iteration);
+            //System.out.println("Iteration: " + iteration);
             
             byte[] text = randomBytes(1 + random.nextInt(MAX_STRING_LENGTH),
                                       random);
