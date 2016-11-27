@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public final class BruteCodingTest {
 
-    private static final int ITERATIONS = 1;
+    private static final int ITERATIONS = 10;
     private static final int MAX_STRING_LENGTH = 10;
     
     @Test
@@ -19,12 +19,14 @@ public final class BruteCodingTest {
         System.out.println("Seed = " + seed);
         
         for (int iteration = 0; iteration < ITERATIONS; ++iteration) {
+            System.out.println("Iteration: " + iteration);
+            
             byte[] text = randomBytes(1 + random.nextInt(MAX_STRING_LENGTH),
                                       random);
-            Map<Byte, Float> weightMap = 
-                    new ByteWeightComputer().computeCharacterWeights(text);
+            Map<Byte, Integer> frequencyMap = 
+                    new ByteCountComputer().computeCharacterWeights(text);
             
-            HuffmanTree tree = new HuffmanTree(weightMap);
+            HuffmanTree tree = new HuffmanTree(frequencyMap);
             
             Map<Byte, BitString> encoderMap = tree.inferEncodingMap();
             
@@ -33,7 +35,7 @@ public final class BruteCodingTest {
             BitString encodedText = encoder.encode(encoderMap, text);
             
             HuffmanSerializer serializer = new HuffmanSerializer();
-            byte[] encodedData = serializer.serialize(weightMap, encodedText);
+            byte[] encodedData = serializer.serialize(frequencyMap, encodedText);
             
             HuffmanDeserializer deserializer = new HuffmanDeserializer();
             HuffmanDeserializer.Result result = 

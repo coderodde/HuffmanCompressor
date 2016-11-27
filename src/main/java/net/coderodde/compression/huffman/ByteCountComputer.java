@@ -1,6 +1,5 @@
 package net.coderodde.compression.huffman;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,7 +10,7 @@ import java.util.TreeMap;
  * @author Rodion "rodde" Efremov
  * @version 1.618 (Nov 19, 2016)
  */
-public final class ByteWeightComputer {
+public final class ByteCountComputer {
 
     /**
      * Computes the map mapping each character in the text {@code text} to its
@@ -20,24 +19,18 @@ public final class ByteWeightComputer {
      * @param text the text for which to compute the frequencies.
      * @return the map mapping each character to its respective frequency.
      */
-    public Map<Byte, Float> computeCharacterWeights(byte[] text) {
-        Map<Byte, Float> map = new TreeMap<>();
+    public Map<Byte, Integer> computeCharacterWeights(byte[] text) {
+        Map<Byte, Integer> map = new TreeMap<>();
         int textLength = text.length;
 
         for (int i = 0; i != textLength; ++i) {
             byte currentByte = text[i];
 
             if (map.containsKey(currentByte)) {
-                map.put(currentByte, map.get(currentByte) + 1.0f);
+                map.put(currentByte, map.get(currentByte) + 1);
             } else {
-                map.put(currentByte, 1.0f);
+                map.put(currentByte, 1);
             }
-        }
-
-        float textLengthFloat = textLength;
-
-        for (Map.Entry<Byte, Float> entry : map.entrySet()) {
-            entry.setValue(entry.getValue() / textLengthFloat);
         }
 
         return map;

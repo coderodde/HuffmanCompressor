@@ -1,7 +1,5 @@
 package net.coderodde.compression.huffman;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.coderodde.compression.huffman.HuffmanTree.IntHolder;
 
 /**

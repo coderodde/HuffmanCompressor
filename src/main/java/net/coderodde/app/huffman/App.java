@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import net.coderodde.compression.huffman.BitString;
-import net.coderodde.compression.huffman.ByteWeightComputer;
+import net.coderodde.compression.huffman.ByteCountComputer;
 import net.coderodde.compression.huffman.HuffmanDecoder;
 import net.coderodde.compression.huffman.HuffmanDeserializer;
 import net.coderodde.compression.huffman.HuffmanEncoder;
@@ -89,8 +89,8 @@ public final class App {
     private static void doEncode(File file) throws FileNotFoundException {
         byte[] fileBytes = readBytes(file);
 
-        Map<Byte, Float> weightMap =
-                new ByteWeightComputer()
+        Map<Byte, Integer> weightMap =
+                new ByteCountComputer()
                         .computeCharacterWeights(fileBytes);
 
         Map<Byte, BitString> encodeMap = 

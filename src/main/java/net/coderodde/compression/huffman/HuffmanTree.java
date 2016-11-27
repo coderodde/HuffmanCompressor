@@ -21,14 +21,13 @@ public final class HuffmanTree {
             implements Comparable<HuffmanTreeNode> {
 
         byte character;
-        float weight;
+        int  frequency;
         boolean isLeaf;
         HuffmanTreeNode left;
         HuffmanTreeNode right;
 
-        HuffmanTreeNode(byte character, float weight, boolean isLeaf) {
-            checkWeight(weight);
-            this.weight = weight;
+        HuffmanTreeNode(byte character, int frequency, boolean isLeaf) {
+            this.frequency = checkFrequency(frequency);
             this.isLeaf = isLeaf;
 
             if (isLeaf) {
@@ -38,7 +37,7 @@ public final class HuffmanTree {
 
         @Override
         public int compareTo(HuffmanTreeNode o) {
-            int cmp = Float.compare(weight, o.weight);
+            int cmp = Integer.compare(frequency, o.frequency);
             
             if (cmp != 0) {
                 return cmp;
@@ -52,10 +51,10 @@ public final class HuffmanTree {
                                      HuffmanTreeNode node2) {
             HuffmanTreeNode newNode = 
                     new HuffmanTreeNode((byte) 0,
-                                        node1.weight + node2.weight,
+                                        node1.frequency + node2.frequency,
                                         false);
 
-            if (node1.weight < node2.weight) {
+            if (node1.frequency < node2.frequency) {
                 newNode.left  = node1;
                 newNode.right = node2;
             } else {
@@ -66,17 +65,14 @@ public final class HuffmanTree {
             return newNode;
         }
 
-        private float checkWeight(float weight) {
-            if (Double.isNaN(weight)) {
-                throw new IllegalArgumentException("The input weight is NaN.");
-            }
-
-            if (weight <= 0.0f) {
+        private int checkFrequency(int frequency) {
+            if (frequency <= 0) {
                 throw new IllegalArgumentException(
-                "The input weight is not strictly positive: " + weight);
+                "The input byte frequency must be positive. Received " +
+                        frequency + ".");
             }
 
-            return weight;
+            return frequency;
         }
     }
 
@@ -86,17 +82,17 @@ public final class HuffmanTree {
      * Constructs a Huffman tree from the character frequencies 
      * {@code weightMap}.
      * 
-     * @param weightMap the map mapping each byte to its relative frequency.
+     * @param frequencyMap the map mapping each byte to its frequency.
      */
-    public HuffmanTree(Map<Byte, Float> weightMap) {
-        if (weightMap.isEmpty()) {
+    public HuffmanTree(Map<Byte, Integer> frequencyMap) {
+        if (frequencyMap.isEmpty()) {
             throw new IllegalArgumentException(
                     "Compressor requires a non-empty text.");
         }
 
         Queue<HuffmanTreeNode> queue = new PriorityQueue<>();
 
-        for (Map.Entry<Byte, Float> entry : weightMap.entrySet()) {
+        for (Map.Entry<Byte, Integer> entry : frequencyMap.entrySet()) {
             queue.add(new HuffmanTreeNode(entry.getKey(),
                                           entry.getValue(),
                                           true));
@@ -112,6 +108,11 @@ public final class HuffmanTree {
     }
     
     public byte decodeBitString(IntHolder index, BitString bitString) {
+        if (root.isLeaf) {
+            index.value++;
+            return root.character;
+        }
+        
         HuffmanTreeNode currentNode = root;
         
         while (currentNode.isLeaf == false) {
@@ -132,6 +133,10 @@ public final class HuffmanTree {
 
         if (root.isLeaf) {
             // Corner case. Only one byte value in the text.
+            root.isLeaf = false;
+            root.left = new HuffmanTreeNode(root.character, 
+                                            1, 
+                                            true);
             BitString bs = new BitString();
             bs.appendBit(false);
             map.put(root.character, bs);

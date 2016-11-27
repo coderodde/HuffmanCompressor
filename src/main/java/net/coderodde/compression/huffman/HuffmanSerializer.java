@@ -40,20 +40,20 @@ public final class HuffmanSerializer {
      * Produces a byte array holding the compressed text along with its 
      * encoder map.
      * 
-     * @param weightMap   the encoder map used for encoding the text.
-     * @param encodedText the encoded text.
+     * @param frequencyMap the encoder map used for encoding the text.
+     * @param encodedText  the encoded text.
      * @return an array of byte.
      */
-    public byte[] serialize(Map<Byte, Float> weightMap,
+    public byte[] serialize(Map<Byte, Integer> frequencyMap,
                             BitString encodedText) {
-        ByteList byteList = new ByteList(computeByteListSize(weightMap, 
+        ByteList byteList = new ByteList(computeByteListSize(frequencyMap, 
                                                              encodedText));
         // Emit the magic number:
         for (byte b : MAGIC) {
             byteList.appendByte(b);
         }
 
-        int numberOfCodeWords = weightMap.size();
+        int numberOfCodeWords = frequencyMap.size();
         int numberOfBits = encodedText.length();
 
         // Emit the number of code words.
@@ -69,19 +69,18 @@ public final class HuffmanSerializer {
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
 
         // Emit the code words:
-        for (Map.Entry<Byte, Float> entry : weightMap.entrySet()) {
+        for (Map.Entry<Byte, Integer> entry : frequencyMap.entrySet()) {
             byte character = entry.getKey();
-            float weight = entry.getValue();
-            int weightData = Float.floatToIntBits(weight);
+            int frequency = entry.getValue();
             
             // Emit the character:
             byteList.appendByte(character);
 
             // Emit the bytes of the weight value:
-            byteList.appendByte((byte) (weightData & 0xff));
-            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
-            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
-            byteList.appendByte((byte)((weightData >>= 8) & 0xff));
+            byteList.appendByte((byte) (frequency & 0xff));
+            byteList.appendByte((byte)((frequency >>= 8) & 0xff));
+            byteList.appendByte((byte)((frequency >>= 8) & 0xff));
+            byteList.appendByte((byte)((frequency >>= 8) & 0xff));
         }
 
         byte[] encodedTextBytes = encodedText.toByteArray();
@@ -94,11 +93,11 @@ public final class HuffmanSerializer {
         return byteList.toByteArray();
     }
 
-    private int computeByteListSize(Map<Byte, Float> weightMap,
+    private int computeByteListSize(Map<Byte, Integer> frequencyMap,
                                     BitString encodedText) {
         return MAGIC.length + BYTES_PER_CODE_WORD_COUNT_ENTRY
                             + BYTES_PER_BIT_COUNT_ENTRY
-                            + weightMap.size() * BYTES_PER_WEIGHT_MAP_ENTRY 
+                            + frequencyMap.size() * BYTES_PER_WEIGHT_MAP_ENTRY 
                             + encodedText.getNumberOfBytesOccupied();
     }
 }
