@@ -16,7 +16,7 @@ public final class HuffmanTree {
     static final class IntHolder {
         int value;
     }
-    
+
     private static final class HuffmanTreeNode 
             implements Comparable<HuffmanTreeNode> {
 
@@ -38,11 +38,11 @@ public final class HuffmanTree {
         @Override
         public int compareTo(HuffmanTreeNode o) {
             int cmp = Integer.compare(frequency, o.frequency);
-            
+
             if (cmp != 0) {
                 return cmp;
             }
-            
+
             // If reached here, equal weights so order by the character value:
             return Byte.compare(character, o.character);
         }
@@ -106,7 +106,7 @@ public final class HuffmanTree {
 
         root = queue.peek();
     }
-    
+
     public byte decodeBitString(IntHolder index, BitString bitString) {
         if (root.isLeaf) {
             // Ugly special case: the encoded text contains only one distinct
@@ -116,14 +116,14 @@ public final class HuffmanTree {
             index.value++;
             return root.character;
         }
-        
+
         HuffmanTreeNode currentNode = root;
-        
+
         while (currentNode.isLeaf == false) {
             boolean bit = bitString.readBit(index.value++);
             currentNode = (bit ? currentNode.right : currentNode.left);
         }
-        
+
         return currentNode.character;
     }
 

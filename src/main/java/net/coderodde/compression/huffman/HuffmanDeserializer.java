@@ -45,7 +45,7 @@ public class HuffmanDeserializer {
         Map<Byte, Integer> frequencyMap =
                 extractFrequencyMap(data, 
                                     numberOfCodeWords);
-        
+
         BitString encodedText = extractEncodedText(data, 
                                                    frequencyMap,
                                                    numberOfBits);
@@ -54,13 +54,13 @@ public class HuffmanDeserializer {
 
     private void checkSignature(byte[] data) {
         if (data.length < 4) {
-            throw new InvalidFileFormatException(
+            throw new InvalidFormatException(
             "No file type signature. The file is too short: " + data.length);
         }
 
         for (int i = 0; i != HuffmanSerializer.MAGIC.length; ++i) {
             if (data[i] != HuffmanSerializer.MAGIC[i]) {
-                throw new InvalidFileFormatException(
+                throw new InvalidFormatException(
                 "Bad file type signature.");
             }
         }
@@ -68,7 +68,7 @@ public class HuffmanDeserializer {
 
     private int extractNumberOfCodeWords(byte[] data) {
         if (data.length < 8) {
-            throw new InvalidFileFormatException(
+            throw new InvalidFormatException(
             "No number of code words. The file is too short: " + data.length);
         }
 
@@ -98,16 +98,16 @@ public class HuffmanDeserializer {
                 byte frequencyByte2 = data[dataByteIndex++];
                 byte frequencyByte3 = data[dataByteIndex++];
                 byte frequencyByte4 = data[dataByteIndex++];
-                
+
                 int frequency = Byte.toUnsignedInt(frequencyByte1);
                 frequency |= (Byte.toUnsignedInt(frequencyByte2) << 8);
                 frequency |= (Byte.toUnsignedInt(frequencyByte3) << 16);
                 frequency |= (Byte.toUnsignedInt(frequencyByte4) << 24);
-                
+
                 frequencyMap.put(character, frequency);
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new InvalidFileFormatException("Invalid format.");
+            throw new InvalidFormatException("Invalid format.");
         }
 
         return frequencyMap;
@@ -119,7 +119,7 @@ public class HuffmanDeserializer {
         int omittedBytes = HuffmanSerializer.MAGIC.length +
                            HuffmanSerializer.BYTES_PER_BIT_COUNT_ENTRY +
                            HuffmanSerializer.BYTES_PER_CODE_WORD_COUNT_ENTRY;
-        
+
         omittedBytes += frequencyMap.size() * 
                         HuffmanSerializer.BYTES_PER_WEIGHT_MAP_ENTRY;
 
@@ -142,7 +142,7 @@ public class HuffmanDeserializer {
                 }
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new InvalidFileFormatException("Invalid file format.");
+            throw new InvalidFormatException("Invalid file format.");
         }
 
         return encodedText;
@@ -150,7 +150,7 @@ public class HuffmanDeserializer {
 
     private int extractNumberOfEncodedTextBits(byte[] data) {
         if (data.length < 12) {
-            throw new InvalidFileFormatException(
+            throw new InvalidFormatException(
             "No number of encoded text bits. The file is too short: " + 
                     data.length);
         }

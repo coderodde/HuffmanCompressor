@@ -22,12 +22,12 @@ public final class HuffmanDecoder {
         IntHolder index = new IntHolder();
         int bitStringLength = bits.length();
         ByteList byteList = new ByteList();
-        
+
         while (index.value < bitStringLength) {
             byte character = tree.decodeBitString(index, bits);
             byteList.appendByte(character);
         }
-        
+
         return byteList.toByteArray();
     }
 }

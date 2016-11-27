@@ -72,7 +72,7 @@ public final class HuffmanSerializer {
         for (Map.Entry<Byte, Integer> entry : frequencyMap.entrySet()) {
             byte character = entry.getKey();
             int frequency = entry.getValue();
-            
+
             // Emit the character:
             byteList.appendByte(character);
 
