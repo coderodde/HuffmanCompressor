@@ -42,7 +42,7 @@ public final class HuffmanTree {
             if (cmp != 0) {
                 return cmp;
             }
-
+            
             // If reached here, equal weights so order by the character value:
             return Byte.compare(character, o.character);
         }
@@ -62,7 +62,12 @@ public final class HuffmanTree {
                 newNode.right = node1;
             }
 
+            newNode.character = max(node1.character, node2.character);
             return newNode;
+        }
+        
+        private static byte max(byte a, byte b) {
+            return a > b ? a : b;
         }
 
         private int checkFrequency(int frequency) {

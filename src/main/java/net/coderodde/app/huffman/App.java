@@ -136,7 +136,7 @@ public final class App {
         byte[] inputData = readBytes(new File(file1));
         HuffmanDeserializer.Result result = 
                 new HuffmanDeserializer().deserialize(inputData);
-        HuffmanTree decoderTree = new HuffmanTree(result.getEncoderMap());
+        HuffmanTree decoderTree = new HuffmanTree(result.getCountMap());
         HuffmanDecoder decoder = new HuffmanDecoder();
         byte[] originalData = decoder.decode(decoderTree, 
                                              result.getEncodedText());
@@ -259,3 +259,4 @@ public final class App {
         }
     }
 }
+

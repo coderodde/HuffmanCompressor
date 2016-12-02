@@ -40,20 +40,20 @@ public final class HuffmanSerializer {
      * Produces a byte array holding the compressed text along with its 
      * encoder map.
      * 
-     * @param frequencyMap the encoder map used for encoding the text.
+     * @param countMap the encoder map used for encoding the text.
      * @param encodedText  the encoded text.
      * @return an array of byte.
      */
-    public byte[] serialize(Map<Byte, Integer> frequencyMap,
+    public byte[] serialize(Map<Byte, Integer> countMap,
                             BitString encodedText) {
-        ByteList byteList = new ByteList(computeByteListSize(frequencyMap, 
+        ByteList byteList = new ByteList(computeByteListSize(countMap, 
                                                              encodedText));
         // Emit the magic number:
         for (byte b : MAGIC) {
             byteList.appendByte(b);
         }
 
-        int numberOfCodeWords = frequencyMap.size();
+        int numberOfCodeWords = countMap.size();
         int numberOfBits = encodedText.length();
 
         // Emit the number of code words.
@@ -69,7 +69,7 @@ public final class HuffmanSerializer {
         byteList.appendByte((byte)((numberOfBits >>= 8) & 0xff));
 
         // Emit the code words:
-        for (Map.Entry<Byte, Integer> entry : frequencyMap.entrySet()) {
+        for (Map.Entry<Byte, Integer> entry : countMap.entrySet()) {
             byte character = entry.getKey();
             int frequency = entry.getValue();
 

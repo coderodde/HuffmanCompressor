@@ -41,7 +41,7 @@ public final class BruteCodingTest {
             HuffmanDeserializer.Result result = 
                     deserializer.deserialize(encodedData);
             
-            HuffmanTree decoderTree = new HuffmanTree(result.getEncoderMap());
+            HuffmanTree decoderTree = new HuffmanTree(result.getCountMap());
             HuffmanDecoder decoder = new HuffmanDecoder();
             byte[] recoveredText = decoder.decode(decoderTree, 
                                                   result.getEncodedText());

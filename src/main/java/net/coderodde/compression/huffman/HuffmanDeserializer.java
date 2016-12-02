@@ -14,25 +14,25 @@ public class HuffmanDeserializer {
     public static final class Result {
 
         private final BitString encodedText;
-        private final Map<Byte, Integer> frequencyMap;
+        private final Map<Byte, Integer> countMap;
 
         Result(BitString encodedText, 
                Map<Byte, Integer> frequencyMap) {
-            this.encodedText  = encodedText;
-            this.frequencyMap = frequencyMap;
+            this.encodedText = encodedText;
+            this.countMap = frequencyMap;
         }
 
         public BitString getEncodedText() {
             return encodedText;
         }
 
-        public Map<Byte, Integer> getEncoderMap() {
-            return frequencyMap;
+        public Map<Byte, Integer> getCountMap() {
+            return countMap;
         }
     }
 
     /**
-     * Deserialises and returns the data structures need for decoding the text.
+     * Deserializes and returns the data structures need for decoding the text.
      * 
      * @param data the raw byte data previously serialised.
      * @return the data structures needed for decoding the text.
@@ -42,10 +42,8 @@ public class HuffmanDeserializer {
         int numberOfCodeWords = extractNumberOfCodeWords(data);
         int numberOfBits = extractNumberOfEncodedTextBits(data);
 
-        Map<Byte, Integer> frequencyMap =
-                extractFrequencyMap(data, 
-                                    numberOfCodeWords);
-
+        Map<Byte, Integer> frequencyMap = extractCountMap(data, 
+                                                          numberOfCodeWords);
         BitString encodedText = extractEncodedText(data, 
                                                    frequencyMap,
                                                    numberOfBits);
@@ -82,9 +80,26 @@ public class HuffmanDeserializer {
         return numberOfCodeWords;
     }
 
-    private Map<Byte, Integer> extractFrequencyMap(byte[] data,
-                                                 int numberOfCodeWords) {
-        Map<Byte, Integer> frequencyMap = new TreeMap<>();
+    private int extractNumberOfEncodedTextBits(byte[] data) {
+        if (data.length < 12) {
+            throw new InvalidFormatException(
+            "No number of encoded text bits. The file is too short: " + 
+                    data.length);
+        }
+
+        int numberOfEncodedTextBits = 0;
+
+        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[11]) << 24);
+        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[10]) << 16);
+        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[9] ) << 8);
+        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[8]));
+
+        return numberOfEncodedTextBits;
+    }
+
+    private Map<Byte, Integer> extractCountMap(byte[] data,
+                                               int numberOfCodeWords) {
+        Map<Byte, Integer> countMap = new TreeMap<>();
 
         try {
             int dataByteIndex =
@@ -104,13 +119,13 @@ public class HuffmanDeserializer {
                 frequency |= (Byte.toUnsignedInt(frequencyByte3) << 16);
                 frequency |= (Byte.toUnsignedInt(frequencyByte4) << 24);
 
-                frequencyMap.put(character, frequency);
+                countMap.put(character, frequency);
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new InvalidFormatException("Invalid format.");
         }
 
-        return frequencyMap;
+        return countMap;
     }
 
     private BitString extractEncodedText(byte[] data,
@@ -146,22 +161,5 @@ public class HuffmanDeserializer {
         }
 
         return encodedText;
-    }
-
-    private int extractNumberOfEncodedTextBits(byte[] data) {
-        if (data.length < 12) {
-            throw new InvalidFormatException(
-            "No number of encoded text bits. The file is too short: " + 
-                    data.length);
-        }
-
-        int numberOfEncodedTextBits = 0;
-
-        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[11]) << 24);
-        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[10]) << 16);
-        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[9] ) << 8);
-        numberOfEncodedTextBits |= (Byte.toUnsignedInt(data[8]));
-
-        return numberOfEncodedTextBits;
     }
 }
